@@ -22,7 +22,16 @@ The backend will be provided by us, in a file system described in the next parag
 File System
 
 The file system provided, here, will contain all the ImGui IPA. For easier understanding, see below a representation of the fs.
+##  USAGE
+```sh
+$ sudo apt install libsdl2-dev
+$ make setup
+$ make
+$ ./build/monitor
+```
 
+##  FILE TREE
+```
 $ tree system-monitor
 ├── header.h
 ├── imgui                                 // <-- ImGui APIs
@@ -55,6 +64,7 @@ $ tree system-monitor
 └── system.cpp                           // <-- all system resources
 
 5 directories, 28 files
+```
 
 Linux and Proc
 
