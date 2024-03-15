@@ -1,18 +1,17 @@
 #include "header.h"
+#include <sys/utsname.h>
+#include <sstream>
 
-using namespace std;
-
-#if defined(_MSC_VER)
-#include <intrin.h>
-#else
-#include <cpuid.h>
-#endif
 // get cpu id and information, you can use `proc/cpuinfo`
 string CPUinfo()
 {
     char CPUBrandString[0x40];
     unsigned int CPUInfo[4] = {0, 0, 0, 0};
 
+    // unix system
+    // for windoes maybe we must add the following
+    // __cpuid(regs, 0);
+    // regs is the array of 4 positions
     __cpuid(0x80000000, CPUInfo[0], CPUInfo[1], CPUInfo[2], CPUInfo[3]);
     unsigned int nExIds = CPUInfo[0];
 
@@ -20,7 +19,7 @@ string CPUinfo()
 
     for (unsigned int i = 0x80000000; i <= nExIds; ++i)
     {
-        __cpuid_count(i, 0, CPUInfo[0], CPUInfo[1], CPUInfo[2], CPUInfo[3]);
+        __cpuid(i, CPUInfo[0], CPUInfo[1], CPUInfo[2], CPUInfo[3]);
 
         if (i == 0x80000002)
             memcpy(CPUBrandString, CPUInfo, sizeof(CPUInfo));
@@ -33,7 +32,7 @@ string CPUinfo()
     return str;
 }
 
-// Function to get OS name
+// getOsName, this will get the OS of the current computer
 const char *getOsName()
 {
 #ifdef _WIN32
@@ -52,44 +51,123 @@ const char *getOsName()
     return "Other";
 #endif
 }
-
-
-int getNumberOfCores() {
-    long numCores = sysconf(_SC_NPROCESSORS_ONLN);
-    return static_cast<int>(numCores);
+const char *getHostName() {
+    static char hostname[1024];
+    if (gethostname(hostname, sizeof(hostname)) == 0) {
+        return hostname;
+    } else {
+        return "";
+    }
+}
+const char* getUserName() {
+    static char username[1024];
+    if (getlogin_r(username, sizeof(username)) == 0) {
+        return username;
+    } else {
+        return "";
+    }
 }
 
-long long getCPUtimeForCore(int core) {
-    std::ifstream statFile("/proc/stat");
+const char* getCPUName() {
+    std::ifstream cpuinfo("/proc/cpuinfo");
+    if (!cpuinfo) {
+        return "Unknown"; // Retourner "Unknown" si le fichier n'est pas accessible
+    }
+
     std::string line;
-
-    // Search for the line related to the requested core
-    while (std::getline(statFile, line)) {
-        if (line.find("cpu" + std::to_string(core)) == 0) {
-            std::istringstream iss(line);
-            std::string cpuLabel;
-            iss >> cpuLabel;
-
-            if (cpuLabel == "cpu" + std::to_string(core)) {
-                long long user, nice, system, idle, iowait, irq, softirq, steal, guest, guest_nice;
-                iss >> user >> nice >> system >> idle >> iowait >> irq >> softirq >> steal >> guest >> guest_nice;
-                return user + nice + system + idle + iowait + irq + softirq + steal + guest + guest_nice;
+    const std::string marker = "model name";
+    while (std::getline(cpuinfo, line)) {
+        if (line.find(marker) != std::string::npos) {
+            size_t pos = line.find(":");
+            if (pos != std::string::npos) {
+                std::string cpu_name = line.substr(pos + 2); // +2 pour sauter le caractère ':' et l'espace qui le suit
+                static char buffer[256];
+                strncpy(buffer, cpu_name.c_str(), sizeof(buffer) - 1);
+                return buffer;
             }
         }
     }
-
-    return 0;
+    return "Unknown";
 }
 
-// Function to get CPU usage percentage for a specific core
-float getCPUUsageForCore(int core) {
-    long long startTime = getCPUtimeForCore(core);
-    std::this_thread::sleep_for(std::chrono::milliseconds(100)); // Sleep for a short interval
-    long long endTime = getCPUtimeForCore(core);
 
-    long long deltaTime = endTime - startTime;
-    long long totalCPUTime = deltaTime * getNumberOfCores(); // Total CPU time for all cores
-    float usagePercentage = static_cast<float>(deltaTime) / totalCPUTime * 100.0f;
+const char* NumberofWorking() {
+    DIR* dir = opendir("/proc");
+    if (dir == nullptr) {
+        return "Error opening /proc";
+    }
 
-    return usagePercentage;
+    int processCount = 0;
+    struct dirent* entry;
+
+    while ((entry = readdir(dir)) != nullptr) {
+        // Si le nom du répertoire est numérique, nous avons trouvé un processus
+        if (strspn(entry->d_name, "0123456789") == strlen(entry->d_name)) {
+            processCount++;
+        }
+    }
+
+    closedir(dir);
+
+    // Convertir le nombre de processus en const char*
+    static char buffer[50];
+    snprintf(buffer, sizeof(buffer), "%d", processCount);
+    return buffer;
+}
+
+int get_cpu_temperature() {
+    std::ifstream file("/sys/class/thermal/thermal_zone0/temp");
+    if (!file.is_open()) {
+        std::cerr << "Erreur lors de l'ouverture du fichier." << std::endl;
+        return -1;
+    }
+
+    int temp;
+    file >> temp;
+
+    if (file.fail()) {
+        std::cerr << "Erreur lors de la lecture de la température." << std::endl;
+        return -1;
+    }
+
+    file.close();
+
+    return temp / 1000;  // Convertir la température en degrés Celsius
+}
+
+// Fonction pour obtenir le statut du ventilateur (enabled/disabled)
+const char* is_fan_enabled() {
+    std::ifstream file("/sys/class/hwmon/hwmon5/pwm1_enable");
+    int status;
+    if (file >> status) {
+        if (status == 0) return "disabled";
+        if (status == 1) return "enabled";
+        if (status == 2) return "enabled";
+    }
+    return "disabled";  // default to not enabled
+}
+
+// Fonction pour obtenir le niveau du ventilateur (par exemple, "auto")
+const char* get_fan_level() {
+    std::string path = "/sys/class/hwmon/hwmon5/pwm1_enable"; // Ajustez le chemin si nécessaire
+    std::ifstream file(path);
+    if(file) {
+        int level;
+        file >> level;
+        if(level == 1) return "manual";  // Selon la documentation, 1 signifie "manual"
+        if(level == 2) return "auto";    // 2 signifie "auto"
+    }
+    return "unknown";  // Retourne "unknown" si le fichier n'est pas lu correctement
+}
+
+// Fonction pour obtenir la vitesse du ventilateur
+int get_fan_speed() {
+    std::string path = "/sys/class/hwmon/hwmon5/fan1_input"; // Ajustez le chemin si nécessaire
+    std::ifstream file(path);
+    if(file) {
+        int speed;
+        file >> speed;
+        return speed;
+    }
+    return -1;  // Retourne -1 si le fichier n'est pas lu correctement
 }

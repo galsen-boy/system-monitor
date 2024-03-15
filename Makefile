@@ -17,16 +17,15 @@
 EXE = monitor
 IMGUI_DIR = imgui/lib/
 SOURCES = main.cpp
-SOURCES += systemwindow.cpp
-SOURCES += memorywindow.cpp
-SOURCES += networkwindow.cpp
 SOURCES += system.cpp
+SOURCES += mem.cpp
+SOURCES += network.cpp
 SOURCES += $(IMGUI_DIR)/imgui.cpp $(IMGUI_DIR)/imgui_demo.cpp $(IMGUI_DIR)/imgui_draw.cpp $(IMGUI_DIR)/imgui_tables.cpp $(IMGUI_DIR)/imgui_widgets.cpp
 SOURCES += $(IMGUI_DIR)/backend/imgui_impl_sdl.cpp $(IMGUI_DIR)/backend/imgui_impl_opengl3.cpp
 OBJS = $(addsuffix .o, $(basename $(notdir $(SOURCES))))
 UNAME_S := $(shell uname -s)
 
-CXXFLAGS = -I$(IMGUI_DIR) -I$(IMGUI_DIR)/backend -I$(IMP_DIR)
+CXXFLAGS = -I$(IMGUI_DIR) -I$(IMGUI_DIR)/backend
 CXXFLAGS += -g -Wall -Wformat
 LIBS =
 
@@ -66,25 +65,25 @@ CXXFLAGS += -I imgui/lib/gl3w -DIMGUI_IMPL_OPENGL_LOADER_GL3W
 
 ifeq ($(UNAME_S), Linux) #LINUX
 	ECHO_MESSAGE = "Linux"
-	LIBS += -lGL -ldl `sdl2-config --libs` -lsensors -I/usr/include/sensors/sensors.h -L/home/sam/system-monitor/fmt/build -lfmt
+	LIBS += -lGL -ldl `sdl2-config --libs`
 
-	CXXFLAGS += `sdl2-config --cflags` -I/fmt/include/fmt/core.h
+	CXXFLAGS += `sdl2-config --cflags`
 	CFLAGS = $(CXXFLAGS)
 endif
 
 ifeq ($(UNAME_S), Darwin) #APPLE
 	ECHO_MESSAGE = "Mac OS X"
-	LIBS += -framework OpenGL -lsensors -I/usr/include/sensors/sensors.h -framework Cocoa -framework IOKit -framework CoreVideo `sdl2-config --libs`
-	LIBS += -L/usr/local/lib -L/opt/local/lib -lsensors -I/usr/include/sensors/sensors.h
+	LIBS += -framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo `sdl2-config --libs`
+	LIBS += -L/usr/local/lib -L/opt/local/lib
 
-	CXXFLAGS += `sdl2-config --cflags` -lsensors
-	CXXFLAGS += -I/usr/local/include -I/opt/local/include -lsensors -I/usr/include/sensors/sensors.h
+	CXXFLAGS += `sdl2-config --cflags`
+	CXXFLAGS += -I/usr/local/include -I/opt/local/include
 	CFLAGS = $(CXXFLAGS)
 endif
 
 ifeq ($(findstring MINGW,$(UNAME_S)),MINGW)
    ECHO_MESSAGE = "MinGW"
-   LIBS += -lgdi32 -lopengl32 -limm32 `pkg-config --static --libs sdl2` -lsensors -I/usr/include/sensors/sensors.h
+   LIBS += -lgdi32 -lopengl32 -limm32 `pkg-config --static --libs sdl2`
 
    CXXFLAGS += `pkg-config --cflags sdl2`
    CFLAGS = $(CXXFLAGS)
@@ -108,9 +107,6 @@ endif
 
 %.o:imgui/lib/glad/src/%.c
 	$(CC) $(CFLAGS) -c -o $@ $<
-
-%.o:$(IMP_DIR)/%.cpp
-	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 all: $(EXE)
 	@echo Build complete for $(ECHO_MESSAGE)
