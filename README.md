@@ -27,7 +27,7 @@ The file system provided, here, will contain all the ImGui IPA. For easier under
 $ sudo apt install libsdl2-dev
 $ make setup
 $ make
-$ ./build/monitor
+$ ./monitor
 ```
 
 ##  FILE TREE
@@ -65,7 +65,13 @@ $ tree system-monitor
 
 5 directories, 28 files
 ```
+## UML diagrams
 
+```
+See [Class diagrams](docs/class_diagrams.md).
+See [Sequence diagrams](docs/seq_diagrams.md).
+
+```
 Linux and Proc
 
 To monitor the computer system resources and performance system will have to use the /proc filesystem.
