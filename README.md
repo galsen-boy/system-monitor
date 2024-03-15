@@ -67,11 +67,11 @@ $ tree system-monitor
 ```
 ## UML diagrams
 
-```
+
 See [Class diagrams](docs/class_diagrams.md).
 See [Sequence diagrams](docs/seq_diagrams.md).
 
-```
+
 Linux and Proc
 
 To monitor the computer system resources and performance system will have to use the /proc filesystem.
