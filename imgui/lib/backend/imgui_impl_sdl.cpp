@@ -77,7 +77,10 @@ static void ImGui_ImplSDL2_SetClipboardText(void*, const char* text)
 {
     SDL_SetClipboardText(text);
 }
-
+/*ImGui_ImplSDL2_ProcessEvent(const SDL_Event* event):
+ Cette fonction traite les événements SDL et les transmet à ImGui.
+  Elle prend en charge les événements liés à la souris, au clavier et à d'autres 
+  dispositifs d'entrée.*/
 // You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
 // - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application.
 // - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application.
@@ -127,7 +130,10 @@ bool ImGui_ImplSDL2_ProcessEvent(const SDL_Event* event)
     }
     return false;
 }
-
+/*ImGui_ImplSDL2_Init(SDL_Window* window): 
+Cette fonction initialise le backend SDL 2 pour ImGui avec une fenêtre SDL spécifiée.
+ Elle configure les paramètres initiaux, tels que les capacités du backend 
+ et la correspondance des touches du clavier.*/
 static bool ImGui_ImplSDL2_Init(SDL_Window* window)
 {
     g_Window = window;
@@ -233,7 +239,9 @@ void ImGui_ImplSDL2_Shutdown()
         SDL_FreeCursor(g_MouseCursors[cursor_n]);
     memset(g_MouseCursors, 0, sizeof(g_MouseCursors));
 }
-
+/*ImGui_ImplSDL2_UpdateMousePosAndButtons(): 
+Cette fonction met à jour la position et les états des boutons de la souris dans
+ ImGui en fonction des événements SDL.*/
 static void ImGui_ImplSDL2_UpdateMousePosAndButtons()
 {
     ImGuiIO& io = ImGui::GetIO();
@@ -278,7 +286,9 @@ static void ImGui_ImplSDL2_UpdateMousePosAndButtons()
         io.MousePos = ImVec2((float)mx, (float)my);
 #endif
 }
-
+/*ImGui_ImplSDL2_UpdateMouseCursor(): 
+Cette fonction met à jour le curseur de la souris dans ImGui en fonction du curseur actuel 
+et de la configuration d'ImGui.*/
 static void ImGui_ImplSDL2_UpdateMouseCursor()
 {
     ImGuiIO& io = ImGui::GetIO();
@@ -298,7 +308,9 @@ static void ImGui_ImplSDL2_UpdateMouseCursor()
         SDL_ShowCursor(SDL_TRUE);
     }
 }
-
+/*ImGui_ImplSDL2_UpdateGamepads(): 
+Cette fonction met à jour les entrées des manettes de jeu dans ImGui,
+ si elles sont activées et disponibles.*/
 static void ImGui_ImplSDL2_UpdateGamepads()
 {
     ImGuiIO& io = ImGui::GetIO();
@@ -339,7 +351,10 @@ static void ImGui_ImplSDL2_UpdateGamepads()
     #undef MAP_BUTTON
     #undef MAP_ANALOG
 }
-
+/*ImGui_ImplSDL2_NewFrame(SDL_Window* window):
+ Cette fonction est appelée au début de chaque frame ImGui pour effectuer les préparatifs
+  nécessaires, comme la mise à jour de la taille de l'écran et du temps écoulé depuis 
+  la dernière frame.*/
 void ImGui_ImplSDL2_NewFrame(SDL_Window* window)
 {
     ImGuiIO& io = ImGui::GetIO();

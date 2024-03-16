@@ -1,4 +1,5 @@
-// To make sure you don't declare the function more than once by including the header multiple times.
+// Pour s'assurer de ne pas déclarer la fonction plus d'une fois en incluant 
+//l'en-tête plusieurs fois.
 #ifndef header_H
 #define header_H
 
@@ -10,30 +11,31 @@
 #include <vector>
 #include <iostream>
 #include <cmath>
-// lib to read from file
+// librairie à lire à partir du fichier
+
 #include <fstream>
-// for the name of the computer and the logged in user
+// pour le nom de l'ordinateur et de l'utilisateur connecté
 #include <unistd.h>
 #include <limits.h>
-// this is for us to get the cpu information
-// mostly in unix system
-// not sure if it will work in windows
+// cela nous permet d'obtenir des informations sur le processeur
+// principalement dans les systèmes Unix
+// pas sûr que cela fonctionne sous Windows
 #include <cpuid.h>
-// this is for the memory usage and other memory visualization
-// for linux gotta find a way for windows
+// c'est pour l'utilisation de la mémoire et d'autres visualisations de la mémoire
+// pour linux, il faut trouver un moyen pour windows
 #include <sys/types.h>
 #include <sys/sysinfo.h>
 #include <sys/statvfs.h>
-// for time and date
+// pour l'heure et la date
 #include <ctime>
-// ifconfig ip addresses
+// ifconfig adresses ip
 #include <sys/types.h>
 #include <ifaddrs.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <map>
 
-// add for the network
+//  addresse pour le réseau
 #include <sys/socket.h>
 #include <netdb.h>
 #include <string.h>

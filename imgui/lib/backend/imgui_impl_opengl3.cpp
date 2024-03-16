@@ -149,7 +149,10 @@ static GLint        g_AttribLocationTex = 0, g_AttribLocationProjMtx = 0;       
 static GLuint       g_AttribLocationVtxPos = 0, g_AttribLocationVtxUV = 0, g_AttribLocationVtxColor = 0; // Vertex attributes location
 static unsigned int g_VboHandle = 0, g_ElementsHandle = 0;
 
-// Functions
+/*ImGui_ImplOpenGL3_Init(const char* glsl_version): 
+Cette fonction initialise le backend OpenGL 3 pour ImGui.
+ Elle récupère la version OpenGL utilisée par le contexte actuel et configure
+  les capacités du backend en conséquence.*/
 bool    ImGui_ImplOpenGL3_Init(const char* glsl_version)
 {
     // Query for GL version (e.g. 320 for GL 3.2)
@@ -229,12 +232,16 @@ bool    ImGui_ImplOpenGL3_Init(const char* glsl_version)
 
     return true;
 }
-
+/*ImGui_ImplOpenGL3_Shutdown():
+ Cette fonction nettoie les ressources utilisées par le backend OpenGL 3 d'ImGui 
+ lorsqu'il n'est plus nécessaire.*/
 void    ImGui_ImplOpenGL3_Shutdown()
 {
     ImGui_ImplOpenGL3_DestroyDeviceObjects();
 }
-
+/*ImGui_ImplOpenGL3_NewFrame(): Cette fonction prépare le backend OpenGL 3 
+pour afficher une nouvelle frame d'interface utilisateur. 
+Elle crée les objets de rendu OpenGL nécessaires s'ils n'existent pas déjà.*/
 void    ImGui_ImplOpenGL3_NewFrame()
 {
     if (!g_ShaderHandle)
@@ -309,6 +316,10 @@ static void ImGui_ImplOpenGL3_SetupRenderState(ImDrawData* draw_data, int fb_wid
 // OpenGL3 Render function.
 // Note that this implementation is little overcomplicated because we are saving/setting up/restoring every OpenGL state explicitly.
 // This is in order to be able to run within an OpenGL engine that doesn't do so.
+/*ImGui_ImplOpenGL3_RenderDrawData(ImDrawData* draw_data):
+ Cette fonction effectue le rendu des commandes de dessin ImGui. 
+ Elle boucle à travers les listes de commandes de dessin, configure l'état OpenGL approprié,
+  puis dessine les éléments de l'interface utilisateur.*/
 void    ImGui_ImplOpenGL3_RenderDrawData(ImDrawData* draw_data)
 {
     // Avoid rendering when minimized, scale coordinates for retina displays (screen coordinates != framebuffer coordinates)
@@ -442,7 +453,8 @@ void    ImGui_ImplOpenGL3_RenderDrawData(ImDrawData* draw_data)
     glViewport(last_viewport[0], last_viewport[1], (GLsizei)last_viewport[2], (GLsizei)last_viewport[3]);
     glScissor(last_scissor_box[0], last_scissor_box[1], (GLsizei)last_scissor_box[2], (GLsizei)last_scissor_box[3]);
 }
-
+/*ImGui_ImplOpenGL3_CreateFontsTexture():
+ Cette fonction crée la texture des polices utilisée par ImGui pour le rendu du texte.*/
 bool ImGui_ImplOpenGL3_CreateFontsTexture()
 {
     // Build texture atlas
@@ -471,7 +483,8 @@ bool ImGui_ImplOpenGL3_CreateFontsTexture()
 
     return true;
 }
-
+/*ImGui_ImplOpenGL3_DestroyFontsTexture(): 
+Cette fonction détruit la texture des polices lorsque vous n'en avez plus besoin.*/
 void ImGui_ImplOpenGL3_DestroyFontsTexture()
 {
     if (g_FontTexture)
@@ -482,7 +495,9 @@ void ImGui_ImplOpenGL3_DestroyFontsTexture()
         g_FontTexture = 0;
     }
 }
-
+/*CheckShader(GLuint handle, const char* desc) et CheckProgram(GLuint handle, 
+const char* desc): Ces fonctions vérifient si la compilation du shader ou le programme de
+ shader a réussi et affichent les erreurs éventuelles en cas d'échec.*/
 // If you get an error please report on github. You may try different GL context version or GLSL version. See GL<>GLSL version table at the top of this file.
 static bool CheckShader(GLuint handle, const char* desc)
 {
