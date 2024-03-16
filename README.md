@@ -25,7 +25,6 @@ The file system provided, here, will contain all the ImGui IPA. For easier under
 ##  USAGE
 ```sh
 $ sudo apt install libsdl2-dev
-$ make setup
 $ make
 $ ./monitor
 ```
