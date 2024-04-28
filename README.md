@@ -24,6 +24,7 @@ File System
 The file system provided, here, will contain all the ImGui IPA. For easier understanding, see below a representation of the fs.
 ##  USAGE
 ```sh
+$ sudo apt install net-tools
 $ sudo apt install libsdl2-dev
 $ make
 $ ./monitor
